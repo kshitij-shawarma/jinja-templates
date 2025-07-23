@@ -1,78 +1,30 @@
 !
-
 ! Hostname and basic info
-
 !
-
-hostname {{ obj.name | default("default-hostname") }}
-
-{% if obj.platform %}
-
-! Platform: {{ obj.platform.slug }}
-
-{% else %}
-
-! No platform defined
-
+hostname {{ device.name }}
+{% if device.platform %}
+! Platform: {{ device.platform.slug }}
 {% endif %}
-
-{% if obj.location %}
-
-! Location: {{ obj.location.name }}
-
-{% else %}
-
-! No location defined
-
+{% if device.location %}
+! Location: {{ device.location.name }}
 {% endif %}
-
-{% if obj.primary_ip4 %}
-
+{% if device.primary_ip4 %}
 interface Loopback0
-
- description Management
-
- ip address {{ obj.primary_ip4.address }}
-
+description Management
+ip address {{ device.primary_ip4.address }}
 {% else %}
-
 ! No primary IPv4 assigned
-
-interface Loopback0
-
- description Management
-
- ip address 192.0.2.1 255.255.255.0
-
 {% endif %}
-
 !
-
 ! Interface Configuration
-
 !
-
-{% for iface in obj.interfaces %}
-
+{% for iface in device.interfaces %}
 {% if "Ethernet" in iface.name or "Gigabit" in iface.name or "FastEthernet" in iface.name %}
-
 interface {{ iface.name }}
-
- {% if iface.description %}description {{ iface.description }}{% else %}description Configured by Nautobot{% endif %}
-
- {% if iface.enabled %}no shutdown{% else %}shutdown{% endif %}
-
+{% if iface.description %}description {{ iface.description }}{% endif %}
+{% if iface.enabled %}no shutdown{% else %}shutdown{% endif %}
 {% endif %}
-
-{% else %}
-
-! No matching interfaces found
-
 {% endfor %}
-
 !
-
 ! End of Config
-
 !
- 
